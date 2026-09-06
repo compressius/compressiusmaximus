@@ -1,7 +1,7 @@
 #!/bin/sh
 # CompressiusMaximus (cmx) installer — Linux / macOS.
-# Downloads the signed release archive from the distribution host, verifies
-# its checksum and installs a single static binary.
+# Downloads the public release archive, verifies its SHA-256 checksum, and
+# installs a single static binary.
 #
 #   CMX_DIST_URL=https://dl.example.com sh install.sh
 #
