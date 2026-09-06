@@ -10,6 +10,12 @@ Install on Linux or macOS:
 curl -fsSL https://github.com/compressius/compressiusmaximus/releases/latest/download/install.sh | sh
 ```
 
-The installer downloads the matching archive and verifies its SHA-256 value
+Install on Windows from PowerShell:
+
+```powershell
+irm https://raw.githubusercontent.com/compressius/compressiusmaximus/main/install.ps1 | iex
+```
+
+Both installers download the matching archive and verify its SHA-256 value
 from `latest.json` before installing it. Project documentation is available
 at https://compressi.us.

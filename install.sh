@@ -38,6 +38,12 @@ stage() {
   printf '\n==> %s\n' "$1"
 }
 
+progress() {
+  [ "$INTERACTIVE" = 1 ] || return 0
+  printf '\r[%3s%%] %s' "$1" "$2"
+  [ "$1" -ge 100 ] && printf '\n'
+}
+
 download() {
   download_url="$1"
   download_file="$2"
@@ -60,6 +66,7 @@ download() {
   fi
 }
 
+progress 10 "Downloading CMX"
 stage "Downloading CMX"
 if command -v curl >/dev/null 2>&1; then
   if [ -n "${CMX_GITHUB_TOKEN:-}" ]; then
@@ -76,9 +83,11 @@ elif command -v wget >/dev/null 2>&1; then
 else
   echo "error: need curl or wget" >&2; exit 1
 fi
+progress 30 "Download complete"
 
 # --- checksum ----------------------------------------------------------------
 SHA_URL="${BASE%/}/latest.json"
+progress 40 "Fetching release manifest"
 stage "Verifying download"
 download "$SHA_URL" "$TMP/latest.json"
 WANT="$(sed -n "s/.*\"url\"[[:space:]]*:[[:space:]]*\"${ASSET}\".*\"sha256\"[[:space:]]*:[[:space:]]*\"\([a-f0-9][a-f0-9]*\)\".*/\1/p" "$TMP/latest.json" | head -1)"
@@ -98,8 +107,10 @@ else
   exit 1
 fi
 [ "$GOT" = "$WANT" ] || { echo "error: checksum mismatch ($GOT != $WANT)" >&2; exit 1; }
+progress 65 "Checksum verified"
 echo "    checksum verified"
 
+progress 75 "Installing CMX"
 stage "Installing CMX"
 tar -xzf "$TMP/$ASSET" -C "$TMP"
 BIN="$TMP/cmx"
@@ -116,6 +127,7 @@ esac
 
 GATEWAY_STATE="not started"
 SERVICE_STATE="not installed"
+progress 90 "Finishing installation"
 stage "Starting gateway"
 if [ "${CMX_SKIP_START:-0}" = 1 ]; then
   GATEWAY_STATE="not started (skipped)"
@@ -137,6 +149,7 @@ if [ "$(uname -s)" = "Linux" ] && [ "${CMX_INSTALL_SERVICE:-1}" = 1 ] && [ "${CM
     echo "    service install skipped or unavailable"
   fi
 fi
+progress 100 "Installation complete"
 
 printf '\n'
 printf '%s\n' '╭─ CMX installed ─────────────────────────────────'
